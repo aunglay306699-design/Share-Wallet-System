@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Share Wallet</title>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){
+          emailjs.init("JVOsK8u42vh1Tr6FQ");
+       })();
+    </script>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background-color: #f8fafc; 
+            margin: 0; 
+            padding: 20px; 
+            color: #1e293b; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container { 
+            width: 100%;
+            max-width: 420px; 
+            background: white;
+            padding: 30px 20px 25px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative;
+        }
+        .back-icon-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #f1f5f9;
+            border: none;
+            color: #1e293b;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+            font-size: 18px;
+        }
+        .back-icon-btn:hover {
+            background: #e2e8f0;
+        }
+        .profile-icon-container {
+            width: 80px;
+            height: 80px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 38px;
+        }
+        .email-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+        .role-text {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+        .section-box {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 15px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .section-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .limit-count {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: normal;
+        }
+        .collaborator-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 12px 0;
+            font-size: 14px;
+            color: #475569;
+        }
+        .collaborator-list li {
+            padding: 6px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .invite-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+        }
+        .invite-btn:hover {
+            text-decoration: underline;
+        }
+        .invite-btn:disabled {
+            color: #94a3b8;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+        .logout-btn {
+            width: 100%;
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: #fee2e2;
+        }
+
+        /* Modal Styling */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0, 0, 0, 0.5); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 9999; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 16px; 
+            width: 90%; 
+            max-width: 380px; 
+            box-sizing: border-box; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); 
+            text-align: left;
+        }
+        .modal-content h3 { 
+            margin-top: 0; 
+            color: #1e293b; 
+            font-size: 18px; 
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-size: 14px; 
+            font-weight: 500; 
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            outline: none;
+        }
+        .modal-btns { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+        .modal-btns button { 
+            flex: 1; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 15px; 
+        }
+        .btn-submit { 
+            background: #3b82f6; 
+            color: white; 
+        }
+        .btn-cancel { 
+            background: #e2e8f0; 
+            color: #475569; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="back-icon-btn" onclick="goBack()" title="နောက်သို့">
+        <span>⬅️</span>
+    </button>
+
+    <div class="profile-icon-container">
+        <span>👤</span>
+    </div>
+
+    <div class="email-text" id="userEmail">Loading...</div>
+    <div class="role-text">Share Wallet Member</div>
+
+    <div class="section-box">
+        <h3>
+            Collaborator 
+            <span class="limit-count" id="limitCountText">(0/2)</span>
+        </h3>
+        <ul class="collaborator-list" id="collaboratorList">
+            <li>Loading...</li>
+        </ul>
+        <button class="invite-btn" id="inviteBtnElement" onclick="openInviteModal()">
+            <span>➕</span>
+            To Invite (Invite Member)
+        </button>
+    </div>
+
+    <button class="logout-btn" onclick="logoutUser()">
+        <span>🚪</span>
+        Log Out
+    </button>
+</div>
+
+<!-- Invite Modal Popup -->
+<div class="modal" id="inviteModal">
+    <div class="modal-content">
+        <h3>Member ဖိတ်ကြားရန်</h3>
+        <div class="form-group">
+            <label>Collaborator Email</label>
+            <input type="email" id="inviteEmailInput" placeholder="example@gmail.com">
+        </div>
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeInviteModal()">မလုပ်တော့ပါ</button>
+            <button class="btn-submit" onclick="submitInvite()">ဖိတ်ကြားမည်</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBBc-raJ2RfLOXHSyAZhYYzYJhSuFI37PM",
+        authDomain: "share-wallet-c7ff8.firebaseapp.com",
+        projectId: "share-wallet-c7ff8",
+        storageBucket: "share-wallet-c7ff8.firebasestorage.app",
+        messagingSenderId: "694101492185",
+        appId: "1:694101492185:web:8c5205395ffeed193ed9c8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUserEmail = "";
+    let currentCollaboratorCount = 0;
+
+    window.goBack = function() {
+        window.location.replace("dashboard-v2.html");
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserEmail = user.email;
+            document.getElementById('userEmail').innerText = user.email || user.displayName || 'အမည်မသိ';
+            loadCollaborators();
+        } else {
+            window.location.replace("index.html");
+        }
+    });
+
+    window.openInviteModal = function() {
+        if (currentCollaboratorCount >= 2) {
+            alert("Member အများဆုံး ၂ ယောက်သာ ဖိတ်ကြားခွင့်ရှိပါသည်။");
+            return;
+        }
+        document.getElementById('inviteModal').style.display = 'flex';
+    };
+
+    window.closeInviteModal = function() {
+        document.getElementById('inviteModal').style.display = 'none';
+        document.getElementById('inviteEmailInput').value = '';
+    };
+
+    window.submitInvite = async function() {
+        const emailInput = document.getElementById('inviteEmailInput').value.trim();
+        if(!emailInput) {
+            alert("ကျေးဇူးပြု၍ Email ထည့်သွင်းပါ");
+            return;
+        }
+
+        if (currentCollaboratorCount >= 2) {
+            alert("Member အများဆုံး ၂ ယောက် ပြည့်သွားပါပြီ။");
+            closeInviteModal();
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "collaborators"), {
+                owner: currentUserEmail,
+                collaboratorEmail: emailInput,
+                timestamp: serverTimestamp()
+            });
+
+            const templateParams = {
+                to_email: emailInput,
+                owner_email: currentUserEmail
+            };
+            
+            await emailjs.send('service_3elf14c', 'template_37j2nbj', templateParams);
+
+            alert("Member ဖိတ်ကြားခြင်းနှင့် Email ပို့ခြင်း အောင်မြင်ပါသည်။");
+            closeInviteModal();
+            loadCollaborators();
+        } catch (error) {
+            console.error("Full Error Details:", error);
+            alert("Error: " + (error.text || error.message || JSON.stringify(error)));
+        }
+    };
+
+    async function loadCollaborators() {
+        const listEl = document.getElementById('collaboratorList');
+        const limitTextEl = document.getElementById('limitCountText');
+        const inviteBtn = document.getElementById('inviteBtnElement');
+        
+        listEl.innerHTML = "<li>Loading...</li>";
+        try {
+            const q = query(collection(db, "collaborators"), where("owner", "==", currentUserEmail));
+            const querySnapshot = await getDocs(q);
+            
+            currentCollaboratorCount = querySnapshot.size;
+            limitTextEl.innerText = `(${currentCollaboratorCount}/2)`;
+
+            listEl.innerHTML = "";
+            if (querySnapshot.empty) {
+                listEl.innerHTML = "<li style='border:none; color:#94a3b8;'>ဖိတ်ကြားထားသူ မရှိသေးပါ</li>";
+            } else {
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>👤 ${data.collaboratorEmail}</span>`;
+                    listEl.appendChild(li);
+                });
+            }
+
+            if (currentCollaboratorCount >= 2) {
+                inviteBtn.disabled = true;
+                inviteBtn.innerHTML = `<span>🚫</span> Member အပြည့်ရှိပါပြီ (၂/၂)`;
+            } else {
+                inviteBtn.disabled = false;
+                inviteBtn.innerHTML = `<span>➕</span> To Invite (Invite Member)`;
+            }
+
+        } catch (error) {
+            console.error("Error loading collaborators:", error);
+            listEl.innerHTML = "<li style='border:none; color:#ef4444;'>ဒေတာ ရယူ၍မရပါ</li>";
+        }
+    }
+
+    window.logoutUser = async function() {
+        try {
+            await signOut(auth);
+            window.location.replace("index.html");
+        } catch (error) {
+            console.error("Logout Error: ", error);
+        }
+    };
+</script>
+
+</body>
+</html>

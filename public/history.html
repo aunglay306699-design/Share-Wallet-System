@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Share Wallet</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background-color: #f8fafc; 
+            margin: 0; 
+            padding: 10px; 
+            color: #1e293b; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            overscroll-behavior-y: none;
+            box-sizing: border-box;
+        }
+        .container { 
+            width: 100%;
+            max-width: 420px; 
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: #1e293b;
+            font-size: 18px;
+        }
+        .back-btn:hover {
+            background-color: #e2e8f0;
+        }
+        h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .history-list {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px;
+            background: #fff;
+        }
+        .history-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .history-info h4 {
+            margin: 0 0 3px 0;
+            font-size: 14px;
+            color: #334155;
+        }
+        .history-info small {
+            color: #64748b;
+            font-size: 11px;
+            display: block;
+        }
+        .history-amount {
+            font-weight: bold;
+            font-size: 15px;
+            text-align: right;
+        }
+        .amount-expense {
+            color: #ef4444;
+        }
+        .amount-income {
+            color: #22c55e;
+        }
+        
+        .control-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 6px;
+        }
+        .control-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 6px 2px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #334155;
+            flex: 1;
+            height: 48px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+            outline: none;
+            text-align: center;
+        }
+        .control-btn .icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+        .control-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        /* Custom Dropdown Styling */
+        .custom-dropdown {
+            position: relative;
+            flex: 1;
+            height: 48px;
+        }
+        .dropdown-select-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            color: #334155;
+            box-sizing: border-box;
+            gap: 2px;
+        }
+        .dropdown-select-btn:hover {
+            border-color: #3b82f6;
+        }
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            bottom: 58px;
+            left: 0;
+            width: 130px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            list-style: none;
+            padding: 4px 0;
+            margin: 0;
+            text-align: left;
+        }
+        .dropdown-list li {
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #334155;
+        }
+        .dropdown-list li:hover {
+            background: #f1f5f9;
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="goBack()" title="နောက်သို့">
+            <span>⬅️</span>
+        </button>
+        <h2>ငွေသွင်း/ငွေထုတ် မှတ်တမ်းများ</h2>
+    </div>
+
+    <div class="history-list" id="historyList">
+        <!-- Data will load here dynamically -->
+    </div>
+
+    <!-- အောက်ဆုံးက Control Box -->
+    <div class="control-box">
+        <!-- Custom Dropdown Menu -->
+        <div class="custom-dropdown">
+            <button class="dropdown-select-btn" onclick="toggleDropdown(event)">
+                <span style="font-size: 14px;">📅</span>
+                <span id="selectedFilterText">ဒီလ</span>
+            </button>
+            <ul class="dropdown-list" id="dropdownList">
+                <li onclick="selectFilter('month', 'ဒီလ')">ဒီလ</li>
+                <li onclick="selectFilter('today', 'ဒီနေ့')">ဒီနေ့</li>
+                <li onclick="selectFilter('all', 'အားလုံး')">အားလုံး</li>
+            </ul>
+        </div>
+
+        <button class="control-btn active" id="btnAll" onclick="toggleType('all')">
+            <span class="icon">📋</span>
+            Log
+        </button>
+
+        <button class="control-btn" id="btnIncome" onclick="toggleType('income')">
+            <span class="icon">📥</span>
+            ထည့်ငွေ
+        </button>
+
+        <button class="control-btn" id="btnExpense" onclick="toggleType('expense')">
+            <span class="icon">📤</span>
+            ထုတ်ငွေ
+        </button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBBc-raJ2RfLOXHSyAZhYYzYJhSuFI37PM",
+        authDomain: "share-wallet-c7ff8.firebaseapp.com",
+        projectId: "share-wallet-c7ff8",
+        storageBucket: "share-wallet-c7ff8.firebasestorage.app",
+        messagingSenderId: "694101492185",
+        appId: "1:694101492185:web:8c5205395ffeed193ed9c8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let allTransactions = [];
+    let currentType = 'all';
+    let currentFilter = 'month';
+
+    window.goBack = function() {
+        window.location.replace("dashboard-v2.html");
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            await fetchAllTransactions();
+            applyFilters();
+        } else {
+            window.location.replace("index.html");
+        }
+    });
+
+    window.toggleDropdown = function(event) {
+        event.stopPropagation();
+        const list = document.getElementById('dropdownList');
+        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+    };
+
+    window.selectFilter = function(value, text) {
+        currentFilter = value;
+        document.getElementById('selectedFilterText').innerText = text;
+        document.getElementById('dropdownList').style.display = 'none';
+        applyFilters();
+    };
+
+    // Screen ရဲ့ အခြားနေရာကို နှိပ်ရင် Dropdown ပိတ်သွားစေရန်
+    window.addEventListener('click', () => {
+        const list = document.getElementById('dropdownList');
+        if (list) list.style.display = 'none';
+    });
+
+    async function fetchAllTransactions() {
+        try {
+            const q = query(collection(db, "transactions"), orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+            allTransactions = [];
+            querySnapshot.forEach((doc) => {
+                allTransactions.push({ id: doc.id, ...doc.data() });
+            });
+        } catch (error) {
+            console.error("Error fetching transactions: ", error);
+        }
+    }
+
+    window.toggleType = function(type) {
+        currentType = type;
+        updateButtonStyles();
+        applyFilters();
+    };
+
+    function updateButtonStyles() {
+        const btnAll = document.getElementById('btnAll');
+        const btnIncome = document.getElementById('btnIncome');
+        const btnExpense = document.getElementById('btnExpense');
+
+        btnAll.classList.remove('active');
+        btnIncome.classList.remove('active');
+        btnExpense.classList.remove('active');
+
+        if (currentType === 'all') {
+            btnAll.classList.add('active');
+        } else if (currentType === 'income') {
+            btnIncome.classList.add('active');
+        } else if (currentType === 'expense') {
+            btnExpense.classList.add('active');
+        }
+    }
+
+    window.applyFilters = function() {
+        const historyListEl = document.getElementById('historyList');
+        historyListEl.innerHTML = '';
+
+        const now = new Date();
+        const todayStr = now.toDateString();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        const filtered = allTransactions.filter(item => {
+            if (currentType !== 'all' && item.type !== currentType) {
+                return false;
+            }
+
+            if (!item.timestamp || !item.timestamp.toDate) return false;
+            const itemDate = item.timestamp.toDate();
+
+            if (currentFilter === 'today') {
+                return itemDate.toDateString() === todayStr;
+            } else if (currentFilter === 'month') {
+                return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            historyListEl.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 40px;">မှတ်တမ်း မရှိပါ။</p>';
+            return;
+        }
+
+        filtered.forEach(data => {
+            const isExpense = data.type === 'expense';
+            const sign = isExpense ? '-' : '+';
+            const amountClass = isExpense ? 'amount-expense' : 'amount-income';
+            
+            let dateStr = 'ရက်စွဲ မရှိ';
+            if (data.timestamp && data.timestamp.toDate) {
+                dateStr = data.timestamp.toDate().toLocaleString();
+            }
+
+            let displayName = data.name || data.userName || data.displayName;
+            if (!displayName && data.user) {
+                displayName = data.user.includes('@') ? data.user.split('@')[0] : data.user;
+            }
+            if (!displayName && data.email) {
+                displayName = data.email.split('@')[0];
+            }
+            if (!displayName) {
+                displayName = 'အမည်မသိ';
+            }
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'history-item';
+            itemDiv.innerHTML = `
+                <div class="history-info">
+                    <h4>${data.note || (isExpense ? 'ထုတ်ငွေ' : 'ထည့်ငွေ')}</h4>
+                    <small>${dateStr}</small>
+                    <small style="color: #2563eb; font-weight: 600;">👤 ${displayName}</small>
+                </div>
+                <div class="history-amount ${amountClass}">
+                    ${sign} ${Number(data.amount).toLocaleString()} Ks
+                </div>
+            `;
+            historyListEl.appendChild(itemDiv);
+        });
+    }
+</script>
+
+</body>
+</html>
