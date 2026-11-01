@@ -215,41 +215,33 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { 
+    auth, db, 
+    onAuthStateChanged, 
+    doc, getDoc, setDoc, updateDoc, 
+    collection, addDoc, serverTimestamp,
+    onSnapshot 
+} from "./firebase-config.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBBc-raJ2RfLOXHSyAZhYYzYJhSuFI37PM",
-        authDomain: "share-wallet-c7ff8.firebaseapp.com",
-        projectId: "share-wallet-c7ff8",
-        storageBucket: "share-wallet-c7ff8.firebasestorage.app",
-        messagingSenderId: "694101492185",
-        appId: "1:694101492185:web:8c5205395ffeed193ed9c8"
-    };
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const email = user.email;
+        const name = email.split('@')[0].toUpperCase();
+        document.getElementById('userNameDisplay').innerText = name;
+        document.getElementById('userEmailDisplay').innerText = email;
+        document.getElementById('userInitial').innerText = name.charAt(0);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        loadWalletBalance();
+    } else {
+        window.location.replace("index.html");
+    }
+});
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const email = user.email;
-            const name = email.split('@')[0].toUpperCase();
-            document.getElementById('userNameDisplay').innerText = name;
-            document.getElementById('userEmailDisplay').innerText = email;
-            document.getElementById('userInitial').innerText = name.charAt(0);
-
-            loadWalletBalance();
-        } else {
-            window.location.replace("index.html");
-        }
-    });
-
-    async function loadWalletBalance() {
-        try {
-            const walletRef = doc(db, "wallet", "shared_balance");
-            const walletSnap = await getDoc(walletRef);
+// onSnapshot ကို အသုံးပြု၍ Real-time ဖြင့် လက်ကျန်ငွေကို နားထောင်ခြင်း[cite: 10]
+function loadWalletBalance() {
+    try {
+        const walletRef = doc(db, "wallet", "shared_balance");
+        onSnapshot(walletRef, async (walletSnap) => {
             if (walletSnap.exists()) {
                 const balance = walletSnap.data().amount || 0;
                 document.getElementById('totalBalance').innerText = Number(balance).toLocaleString() + " Ks";
@@ -257,38 +249,40 @@
                 await setDoc(walletRef, { amount: 0 });
                 document.getElementById('totalBalance').innerText = "0 Ks";
             }
-        } catch (error) {
-            console.error("Error loading balance: ", error);
-        }
+        }, (error) => {
+            console.error("Error listening to balance: ", error);
+        });
+    } catch (error) {
+        console.error("Error setting up balance listener: ", error);
     }
+}
 
-    window.openTransactionModal = function(type) {
-        document.getElementById('txModal').style.display = 'flex';
-        document.getElementById('txType').value = type;
-        const titleEl = document.getElementById('modalTitle');
-        const labelEl = document.getElementById('labelTypeTitle');
-        
-        if(type === 'expense') {
-            titleEl.innerText = "ထုတ်ငွေ စာရင်းသွင်းရန်";
-            labelEl.innerText = "ပမာဏ - အသုံးစရိတ် (နုတ်မည်)";
-        } else {
-            titleEl.innerText = "ထည့်ငွေ စာရင်းသွင်းရန်";
-            labelEl.innerText = "ပမာဏ - ဝင်ငွေ / မတည်ငွေ (ပေါင်းမည်)";
-        }
-    };
+window.openTransactionModal = function(type) {
+    document.getElementById('txModal').style.display = 'flex';
+    document.getElementById('txType').value = type;
+    const titleEl = document.getElementById('modalTitle');
+    const labelEl = document.getElementById('labelTypeTitle');
+    
+    if(type === 'expense') {
+        titleEl.innerText = "ထုတ်ငွေ စာရင်းသွင်းရန်";
+        labelEl.innerText = "ပမာဏ - အသုံးစရိတ် (နုတ်မည်)";
+    } else {
+        titleEl.innerText = "ထည့်ငွေ စာရင်းသွင်းရန်";
+        labelEl.innerText = "ပမာဏ - ဝင်ငွေ / မတည်ငွေ (ပေါင်းမည်)";
+    }
+};
 
-    window.closeTransactionModal = function() {
-        document.getElementById('txModal').style.display = 'none';
-        document.getElementById('txAmount').value = '';
-        document.getElementById('txNote').value = '';
-    };
+window.closeTransactionModal = function() {
+    document.getElementById('txModal').style.display = 'none';
+    document.getElementById('txAmount').value = '';
+    document.getElementById('txNote').value = '';
+};
 
-    window.submitTransaction = async function() {
+window.submitTransaction = async function() {
     const submitBtn = document.getElementById('submitBtn');
     
-    // ခလုတ်ကို တစ်ချက်နှိပ်လိုက်တာနဲ့ နောက်ထပ်ထပ်နှိပ်လို့မရအောင် ပိတ်လိုက်မည် (Disabled)
     submitBtn.disabled = true;
-    submitBtn.style.opacity = "0.6"; // မှေးသွားအောင် လုပ်ခြင်း
+    submitBtn.style.opacity = "0.6";
     submitBtn.innerText = "သိမ်းဆည်းနေသည်...";
 
     const type = document.getElementById('txType').value;
@@ -297,8 +291,6 @@
 
     if(isNaN(amountVal) || amountVal <= 0) {
         alert("ကျေးဇူးပြု၍ မှန်ကန်သော ငွေပမာဏ ထည့်သွင်းပါ");
-        
-        // အမှားပါလို့ ရပ်လိုက်ရင် ခလုတ်ကို ပြန်ဖွင့်ပေးရပါမည်
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         submitBtn.innerText = "သိမ်းမည်";
@@ -340,24 +332,12 @@
             timestamp: serverTimestamp()
         });
 
-        // Telegram သို့ Notification ပို့ရန်
-        try {
-            const botToken = "8940863475:AAGT20ryQjTkDNFAPulMlRY02Z0yV5iiM";
-            const chatId = "-1004385591619";
-            const msg = `💰 Share Wallet အပ်ဒိတ်\n\n👤 ${auth.currentUser.email}\n${type === 'expense' ? 'ထုတ်ငွေ 📤' : 'ထည့်ငွေ 📥'}: ${amountVal.toLocaleString()} Ks\n📝 မှတ်ချက်: ${note}`;
-            
-            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
-        } catch (tgError) {
-            console.error("Telegram Error:", tgError);
-        }
-
         alert("စာရင်း သိမ်းဆည်းခြင်း အောင်မြင်ပါသည်။");
         closeTransactionModal();
-        loadWalletBalance();
+        // onSnapshot သုံးထားသဖြင့် loadWalletBalance() ကို ထပ်ခေါ်စရာမလိုတော့ပါ၊ အလိုအလျောက် အပ်ဒိတ်ဖြစ်သွားပါမည်[cite: 10]
     } catch (error) {
         alert("Error: " + error.message);
     } finally {
-        // အောင်မြင်든၊ Error တက်သည်ဖြစ်စေ လုပ်ငန်းစဉ်ပြီးဆုံးပါက ခလုတ်ကို မူလအနေအထားသို့ ပြန်ပြောင်းပေးမည်
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         submitBtn.innerText = "သိမ်းမည်";
