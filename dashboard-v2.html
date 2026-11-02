@@ -5,41 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Wallet - Dashboard</title>
     <style>
-        body { 
-            font-family: sans-serif; 
-            background-color: #f8fafc; 
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background:
+                radial-gradient(ellipse at 12% 18%, rgba(56, 189, 248, 0.3), transparent 38%),
+                radial-gradient(ellipse at 88% 78%, rgba(139, 92, 246, 0.3), transparent 40%),
+                linear-gradient(135deg, #10182d, #202b49 52%, #17152f);
             margin: 0; 
             padding: 20px; 
-            color: #1e293b; 
+            color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
         }
-        .container { 
+        .container {
             width: 100%;
             max-width: 420px; 
-            background: white;
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.07));
             padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.28);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.28);
+            backdrop-filter: blur(28px) saturate(145%);
+            -webkit-backdrop-filter: blur(28px) saturate(145%);
         }
         .user-card { 
-            background: #f8fafc; 
             padding: 15px; 
             border-radius: 12px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
             margin-bottom: 15px; 
             display: flex; 
             align-items: center; 
             gap: 12px; 
-            border: 1px solid #e2e8f0;
+            
+            background: linear-gradient(120deg, rgba(255,255,255,0.17), rgba(255,255,255,0.07));
+            box-shadow: 0 12px 30px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.24);
+            backdrop-filter: blur(18px) saturate(135%);
+            -webkit-backdrop-filter: blur(18px) saturate(135%);
         }
         .avatar { 
             width: 40px; 
             height: 40px; 
-            background: #3b82f6; 
+            background: linear-gradient(135deg, #60a5fa, #6366f1);
             color: white; 
             border-radius: 50%; 
             display: flex; 
@@ -47,14 +56,18 @@
             justify-content: center; 
             font-weight: bold; 
         }
-        .wallet-card { 
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
-            color: white; 
+        .wallet-card {
+            color: #f8fafc;
             padding: 20px; 
-            border-radius: 16px; 
+            border-radius: 12px; 
             text-align: center; 
             margin-bottom: 25px; 
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); 
+           
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
+            box-shadow: 0 18px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.24);
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
         }
         .wallet-card h2 { 
             margin: 0 0 10px 0; 
@@ -69,16 +82,19 @@
         .menu-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; 
+            gap: 12px; 
         }
         .menu-item { 
-            background: #f8fafc; 
             padding: 20px; 
-            border-radius: 16px; 
+            border-radius: 12px; 
             text-align: center; 
             cursor: pointer; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            border: 1px solid #e2e8f0; 
+
+            background: linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.065));
+            box-shadow: 0 14px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.23);
+            backdrop-filter: blur(18px) saturate(135%);
+            -webkit-backdrop-filter: blur(18px) saturate(135%);
         }
         .menu-item .icon { 
             font-size: 32px; 
@@ -89,6 +105,7 @@
             margin: 0; 
             font-weight: 500; 
             font-size: 15px; 
+            font-weight: bold; 
         }
 
         /* Modal Popup Styling */
@@ -99,23 +116,29 @@
             left: 0; 
             width: 100vw; 
             height: 100vh; 
-            background: rgba(0, 0, 0, 0.5); 
+            background: rgba(4, 8, 20, 0.58);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             justify-content: center; 
             align-items: center; 
             z-index: 9999; 
         }
         .modal-content { 
-            background: white; 
             padding: 25px; 
-            border-radius: 16px; 
+            border-radius: 12px; 
             width: 90%; 
             max-width: 380px; 
             box-sizing: border-box; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); 
+            color: #f8fafc;
+            background: linear-gradient(145deg, rgba(38, 51, 78, 0.94), rgba(24, 32, 55, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
         }
         .modal-content h3 { 
             margin-top: 0; 
-            color: #1e293b; 
+            color: #bfdbfe;
             font-size: 18px; 
         }
         .form-group { 
@@ -125,16 +148,24 @@
             display: block; 
             margin-bottom: 5px; 
             font-size: 14px; 
-            font-weight: 500; 
+            font-weight: 600; 
         }
         .form-group input { 
             width: 100%; 
             padding: 12px; 
             box-sizing: border-box; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 10px; 
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 8px; 
             font-size: 16px; 
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
+        .form-group input::placeholder {
+            color: rgba(226, 232, 240, 0.58);
+        }
+        
         .modal-btns { 
             display: flex; 
             gap: 10px; 
@@ -143,19 +174,24 @@
         .modal-btns button { 
             flex: 1; 
             padding: 12px; 
-            border: none; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
             font-size: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            transition: background 0.2s, transform 0.2s;
         }
         .btn-submit { 
-            background: #3b82f6; 
+            background: linear-gradient(135deg, #15803d, #16a34a);
             color: white; 
         }
         .btn-cancel { 
-            background: #e2e8f0; 
-            color: #475569; 
+            background: rgba(255, 255, 255, 0.12);
+            color: #fecaca;
+        }
+        .modal-btns button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.12);
         }
     </style>
 </head>
@@ -166,7 +202,7 @@
         <div class="avatar" id="userInitial">Z</div>
         <div>
             <h4 id="userNameDisplay" style="margin:0; font-size:16px;">Loading...</h4>
-            <small id="userEmailDisplay" style="color: #64748b;">Loading...</small>
+            <small id="userEmailDisplay" style="color: #cbd5e1;">Loading...</small>
         </div>
     </div>
 

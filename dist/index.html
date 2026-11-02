@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Shared Wallet Login & Register</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        .card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        h2 { color: #1e293b; margin-bottom: 1.5rem; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .btn-group { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-login { background: #4f46e5; color: white; }
+        .btn-login:hover { background: #4338ca; }
+        .btn-register { background: white; color: #4f46e5; border: 1px solid #4f46e5; }
+        .btn-register:hover { background: #f5f3ff; }
+    </style>
+  <script type="module" crossorigin src="/assets/main-BnIy4h-X.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-config-ZtR0F1fb.js">
+</head>
+<body>  
+
+    <div class="card">
+        <h2>Shared Wallet</h2>
+        <input type="email" id="email" placeholder="Email">
+        
+        <div class="password-container" style="position: relative; width: 100%;">
+            <input type="password" id="password" placeholder="Password (Min 6 chars)" style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+            <span id="togglePassword" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">
+                <span id="eyeIcon">🙈</span>
+            </span>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn-login" onclick="handleLogin()">Login</button>
+            <button class="btn-register" onclick="handleRegister()">Register အကောင့်ဖွင့်မည်</button>
+        </div>
+        
+        <div class="forgot-password-link" style="margin-top: 15px; text-align: right;">
+            <a href="javascript:void(0)" onclick="location.replace('forgot_password.html')">စကားဝှက်မေ့သွားပါပြီ</a>
+        </div>
+    </div>
+
+</body>
+</html>

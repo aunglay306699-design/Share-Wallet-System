@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History - Share Wallet</title>
     <style>
-        body { 
+       body { 
             font-family: sans-serif; 
-            background-color: #f8fafc; 
+            background:
+                radial-gradient(ellipse at 18% 15%, rgba(68, 115, 255, 0.38), transparent 38%),
+                radial-gradient(ellipse at 88% 82%, rgba(139, 74, 222, 0.34), transparent 40%),
+                linear-gradient(135deg, #10182d, #202b49 52%, #17152f);
             margin: 0; 
             padding: 10px; 
             color: #1e293b; 
@@ -19,13 +22,35 @@
             overscroll-behavior-y: none;
             box-sizing: border-box;
         }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        body::before {
+            top: 8%;
+            left: calc(50% - 260px);
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.42), transparent 70%);
+        }
+        body::after {
+            right: calc(50% - 270px);
+            bottom: 5%;
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.36), transparent 70%);
+        }
         .container { 
             width: 100%;
             max-width: 420px; 
-            background: white;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.065));
             padding: 20px;
             border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
             height: 90vh;
             display: flex;
             flex-direction: column;
@@ -40,8 +65,8 @@
             flex-shrink: 0;
         }
         .back-btn {
-            background: #f1f5f9;
-            border: none;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -49,15 +74,18 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            color: #1e293b;
+            color: #f8fafc;
             font-size: 18px;
+            transition: background 0.2s, transform 0.2s;
         }
         .back-btn:hover {
-            background-color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.24);
+            transform: translateX(-2px);
         }
         h2 {
             margin: 0;
             font-size: 18px;
+            color: #f8fafc;
         }
         .history-list {
             overflow-y: auto;
@@ -69,28 +97,46 @@
             gap: 10px;
             padding-right: 4px;
             margin-bottom: 15px;
-            border: 1px solid #e2e8f0;
             border-radius: 14px;
-            padding: 10px;
-            background: #fff;
+            padding: 10px 4px 10px 10px;
+            background: rgba(8, 15, 32, 0.16);
+            box-shadow: inset 0 1px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+            scrollbar-width: thin;
         }
         .history-item {
-            background: #f8fafc;
             padding: 12px;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.075));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(12px) saturate(135%);
+            -webkit-backdrop-filter: blur(12px) saturate(135%);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .history-item:hover {
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12));
+            transform: translateY(-1px);
+        }
+        .empty-state {
+            margin: 40px 0 0;
+            color: rgba(226, 232, 240, 0.78);
+            text-align: center;
         }
         .history-info h4 {
             margin: 0 0 3px 0;
             font-size: 14px;
-            color: #334155;
+            color: #f8fafc;
         }
         .history-info small {
-            color: #64748b;
+            color: rgba(226, 232, 240, 0.78);
             font-size: 11px;
             display: block;
         }
@@ -100,15 +146,15 @@
             text-align: right;
         }
         .amount-expense {
-            color: #ef4444;
+            color: #fca5a5;
         }
         .amount-income {
-            color: #22c55e;
+            color: #86efac;
         }
         
         .control-box {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
             border-radius: 14px;
             padding: 8px;
             display: flex;
@@ -116,10 +162,13 @@
             align-items: center;
             flex-shrink: 0;
             gap: 6px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 24px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
         }
         .control-btn {
-            background: white;
-            border: 1px solid #cbd5e1;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 10px;
             padding: 6px 2px;
             cursor: pointer;
@@ -130,12 +179,11 @@
             gap: 2px;
             font-size: 10px;
             font-weight: 500;
-            color: #334155;
+            color: #e2e8f0;
             flex: 1;
             height: 48px;
             box-sizing: border-box;
             transition: all 0.2s;
-            outline: none;
             text-align: center;
         }
         .control-btn .icon {
@@ -143,9 +191,12 @@
             line-height: 1;
         }
         .control-btn.active {
-            background: #3b82f6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.88), rgba(99, 102, 241, 0.82));
             color: white;
-            border-color: #3b82f6;
+            border-color: rgba(191, 219, 254, 0.7);
+            box-shadow: 0 4px 18px rgba(59, 130, 246, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         /* Custom Dropdown Styling */
@@ -155,8 +206,8 @@
             height: 48px;
         }
         .dropdown-select-btn {
-            background: white;
-            border: 1px solid #cbd5e1;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 10px;
             width: 100%;
             height: 100%;
@@ -167,12 +218,13 @@
             cursor: pointer;
             font-size: 10px;
             font-weight: 500;
-            color: #334155;
+            color: #e2e8f0;
             box-sizing: border-box;
             gap: 2px;
         }
         .dropdown-select-btn:hover {
-            border-color: #3b82f6;
+            border-color: rgba(147, 197, 253, 0.8);
+            background: rgba(255, 255, 255, 0.16);
         }
         .dropdown-list {
             display: none;
@@ -180,10 +232,12 @@
             bottom: 58px;
             left: 0;
             width: 130px;
-            background: white;
-            border: 1px solid #cbd5e1;
+            background: rgba(20, 29, 52, 0.84);
+            border: 1px solid rgba(255, 255, 255, 0.26);
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
             z-index: 100;
             list-style: none;
             padding: 4px 0;
@@ -194,11 +248,36 @@
             padding: 10px 14px;
             font-size: 13px;
             cursor: pointer;
-            color: #334155;
+            color: #e2e8f0;
         }
         .dropdown-list li:hover {
-            background: #f1f5f9;
-            color: #2563eb;
+            background: rgba(96, 165, 250, 0.18);
+            color: #bfdbfe;
+        }
+        .back-btn:focus-visible,
+        .control-btn:focus-visible,
+        .dropdown-select-btn:focus-visible {
+            outline: 2px solid #bfdbfe;
+            outline-offset: 2px;
+        }
+        @media (max-width: 360px) {
+            .container {
+                padding: 14px;
+            }
+            .control-box {
+                gap: 4px;
+                padding: 6px;
+            }
+            .control-btn {
+                font-size: 9px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
@@ -249,22 +328,11 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBBc-raJ2RfLOXHSyAZhYYzYJhSuFI37PM",
-        authDomain: "share-wallet-c7ff8.firebaseapp.com",
-        projectId: "share-wallet-c7ff8",
-        storageBucket: "share-wallet-c7ff8.firebasestorage.app",
-        messagingSenderId: "694101492185",
-        appId: "1:694101492185:web:8c5205395ffeed193ed9c8"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    import { 
+        auth, db, 
+        onAuthStateChanged, 
+        collection, query, orderBy, getDocs 
+    } from "./firebase-config.js";
 
     let allTransactions = [];
     let currentType = 'all';
@@ -276,8 +344,13 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            await fetchAllTransactions();
-            applyFilters();
+            try {
+                await fetchAllTransactions();
+                applyFilters();
+            } catch (error) {
+                console.error("Error fetching transactions: ", error);
+                showMessage('မှတ်တမ်းများကို ရယူ၍မရပါ။ ပြန်လည်ကြိုးစားပါ။');
+            }
         } else {
             window.location.replace("index.html");
         }
@@ -296,23 +369,18 @@
         applyFilters();
     };
 
-    // Screen ရဲ့ အခြားနေရာကို နှိပ်ရင် Dropdown ပိတ်သွားစေရန်
     window.addEventListener('click', () => {
         const list = document.getElementById('dropdownList');
         if (list) list.style.display = 'none';
     });
 
     async function fetchAllTransactions() {
-        try {
-            const q = query(collection(db, "transactions"), orderBy("timestamp", "desc"));
-            const querySnapshot = await getDocs(q);
-            allTransactions = [];
-            querySnapshot.forEach((doc) => {
-                allTransactions.push({ id: doc.id, ...doc.data() });
-            });
-        } catch (error) {
-            console.error("Error fetching transactions: ", error);
-        }
+        const q = query(collection(db, "transactions"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        allTransactions = [];
+        querySnapshot.forEach((doc) => {
+            allTransactions.push({ id: doc.id, ...doc.data() });
+        });
     }
 
     window.toggleType = function(type) {
@@ -353,8 +421,9 @@
                 return false;
             }
 
-            if (!item.timestamp || !item.timestamp.toDate) return false;
+            if (!item.timestamp || typeof item.timestamp.toDate !== 'function') return false;
             const itemDate = item.timestamp.toDate();
+            if (!(itemDate instanceof Date) || Number.isNaN(itemDate.getTime())) return false;
 
             if (currentFilter === 'today') {
                 return itemDate.toDateString() === todayStr;
@@ -365,7 +434,7 @@
         });
 
         if (filtered.length === 0) {
-            historyListEl.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 40px;">မှတ်တမ်း မရှိပါ။</p>';
+            showMessage('မှတ်တမ်း မရှိပါ။');
             return;
         }
 
@@ -374,36 +443,55 @@
             const sign = isExpense ? '-' : '+';
             const amountClass = isExpense ? 'amount-expense' : 'amount-income';
             
-            let dateStr = 'ရက်စွဲ မရှိ';
-            if (data.timestamp && data.timestamp.toDate) {
-                dateStr = data.timestamp.toDate().toLocaleString();
-            }
+            const dateStr = data.timestamp.toDate().toLocaleString();
 
-            let displayName = data.name || data.userName || data.displayName;
-            if (!displayName && data.user) {
-                displayName = data.user.includes('@') ? data.user.split('@')[0] : data.user;
-            }
-            if (!displayName && data.email) {
-                displayName = data.email.split('@')[0];
-            }
-            if (!displayName) {
-                displayName = 'အမည်မသိ';
-            }
+            const name = [data.name, data.userName, data.displayName]
+                .find(value => typeof value === 'string' && value.trim());
+            const user = typeof data.user === 'string' ? data.user : '';
+            const email = typeof data.email === 'string' ? data.email : '';
+            const displayName = name?.trim()
+                || (user ? user.split('@')[0] : '')
+                || (email ? email.split('@')[0] : '')
+                || 'အမည်မသိ';
+            const note = typeof data.note === 'string' && data.note.trim()
+                ? data.note
+                : (isExpense ? 'ထုတ်ငွေ' : 'ထည့်ငွေ');
+            const amount = Number(data.amount);
 
             const itemDiv = document.createElement('div');
             itemDiv.className = 'history-item';
-            itemDiv.innerHTML = `
-                <div class="history-info">
-                    <h4>${data.note || (isExpense ? 'ထုတ်ငွေ' : 'ထည့်ငွေ')}</h4>
-                    <small>${dateStr}</small>
-                    <small style="color: #2563eb; font-weight: 600;">👤 ${displayName}</small>
-                </div>
-                <div class="history-amount ${amountClass}">
-                    ${sign} ${Number(data.amount).toLocaleString()} Ks
-                </div>
-            `;
+            const info = document.createElement('div');
+            info.className = 'history-info';
+
+            const noteElement = document.createElement('h4');
+            noteElement.textContent = note;
+            info.appendChild(noteElement);
+
+            const dateElement = document.createElement('small');
+            dateElement.textContent = dateStr;
+            info.appendChild(dateElement);
+
+            const userElement = document.createElement('small');
+            userElement.style.color = '#93c5fd';
+            userElement.style.fontWeight = '600';
+            userElement.textContent = `👤 ${displayName}`;
+            info.appendChild(userElement);
+
+            const amountElement = document.createElement('div');
+            amountElement.className = `history-amount ${amountClass}`;
+            amountElement.textContent = `${sign} ${Number.isFinite(amount) ? amount.toLocaleString() : '—'} Ks`;
+
+            itemDiv.append(info, amountElement);
             historyListEl.appendChild(itemDiv);
         });
+    }
+
+    function showMessage(message) {
+        const messageElement = document.createElement('p');
+        messageElement.className = 'empty-state';
+        messageElement.textContent = message;
+        const historyListEl = document.getElementById('historyList');
+        historyListEl.replaceChildren(messageElement);
     }
 </script>
 

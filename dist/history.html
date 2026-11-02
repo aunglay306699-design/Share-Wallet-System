@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Share Wallet</title>
+    <style>
+       body { 
+            font-family: sans-serif; 
+            background:
+                radial-gradient(ellipse at 18% 15%, rgba(68, 115, 255, 0.38), transparent 38%),
+                radial-gradient(ellipse at 88% 82%, rgba(139, 74, 222, 0.34), transparent 40%),
+                linear-gradient(135deg, #10182d, #202b49 52%, #17152f);
+            margin: 0; 
+            padding: 10px; 
+            color: #1e293b; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            overscroll-behavior-y: none;
+            box-sizing: border-box;
+        }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        body::before {
+            top: 8%;
+            left: calc(50% - 260px);
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.42), transparent 70%);
+        }
+        body::after {
+            right: calc(50% - 270px);
+            bottom: 5%;
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.36), transparent 70%);
+        }
+        .container { 
+            width: 100%;
+            max-width: 420px; 
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.065));
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: #f8fafc;
+            font-size: 18px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: translateX(-2px);
+        }
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #f8fafc;
+        }
+        .history-list {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            padding: 10px 4px 10px 10px;
+            background: rgba(8, 15, 32, 0.16);
+            box-shadow: inset 0 1px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+            scrollbar-width: thin;
+        }
+        .history-item {
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.075));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(12px) saturate(135%);
+            -webkit-backdrop-filter: blur(12px) saturate(135%);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .history-item:hover {
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12));
+            transform: translateY(-1px);
+        }
+        .empty-state {
+            margin: 40px 0 0;
+            color: rgba(226, 232, 240, 0.78);
+            text-align: center;
+        }
+        .history-info h4 {
+            margin: 0 0 3px 0;
+            font-size: 14px;
+            color: #f8fafc;
+        }
+        .history-info small {
+            color: rgba(226, 232, 240, 0.78);
+            font-size: 11px;
+            display: block;
+        }
+        .history-amount {
+            font-weight: bold;
+            font-size: 15px;
+            text-align: right;
+        }
+        .amount-expense {
+            color: #fca5a5;
+        }
+        .amount-income {
+            color: #86efac;
+        }
+        
+        .control-box {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 14px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 6px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 24px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+        }
+        .control-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            padding: 6px 2px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #e2e8f0;
+            flex: 1;
+            height: 48px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .control-btn .icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+        .control-btn.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.88), rgba(99, 102, 241, 0.82));
+            color: white;
+            border-color: rgba(191, 219, 254, 0.7);
+            box-shadow: 0 4px 18px rgba(59, 130, 246, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Custom Dropdown Styling */
+        .custom-dropdown {
+            position: relative;
+            flex: 1;
+            height: 48px;
+        }
+        .dropdown-select-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            color: #e2e8f0;
+            box-sizing: border-box;
+            gap: 2px;
+        }
+        .dropdown-select-btn:hover {
+            border-color: rgba(147, 197, 253, 0.8);
+            background: rgba(255, 255, 255, 0.16);
+        }
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            bottom: 58px;
+            left: 0;
+            width: 130px;
+            background: rgba(20, 29, 52, 0.84);
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 10px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+            z-index: 100;
+            list-style: none;
+            padding: 4px 0;
+            margin: 0;
+            text-align: left;
+        }
+        .dropdown-list li {
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #e2e8f0;
+        }
+        .dropdown-list li:hover {
+            background: rgba(96, 165, 250, 0.18);
+            color: #bfdbfe;
+        }
+        .back-btn:focus-visible,
+        .control-btn:focus-visible,
+        .dropdown-select-btn:focus-visible {
+            outline: 2px solid #bfdbfe;
+            outline-offset: 2px;
+        }
+        @media (max-width: 360px) {
+            .container {
+                padding: 14px;
+            }
+            .control-box {
+                gap: 4px;
+                padding: 6px;
+            }
+            .control-btn {
+                font-size: 9px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/history-CLUv9q7z.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-config-ZtR0F1fb.js">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="goBack()" title="နောက်သို့">
+            <span>⬅️</span>
+        </button>
+        <h2>ငွေသွင်း/ငွေထုတ် မှတ်တမ်းများ</h2>
+    </div>
+
+    <div class="history-list" id="historyList">
+        <!-- Data will load here dynamically -->
+    </div>
+
+    <!-- အောက်ဆုံးက Control Box -->
+    <div class="control-box">
+        <!-- Custom Dropdown Menu -->
+        <div class="custom-dropdown">
+            <button class="dropdown-select-btn" onclick="toggleDropdown(event)">
+                <span style="font-size: 14px;">📅</span>
+                <span id="selectedFilterText">ဒီလ</span>
+            </button>
+            <ul class="dropdown-list" id="dropdownList">
+                <li onclick="selectFilter('month', 'ဒီလ')">ဒီလ</li>
+                <li onclick="selectFilter('today', 'ဒီနေ့')">ဒီနေ့</li>
+                <li onclick="selectFilter('all', 'အားလုံး')">အားလုံး</li>
+            </ul>
+        </div>
+
+        <button class="control-btn active" id="btnAll" onclick="toggleType('all')">
+            <span class="icon">📋</span>
+            Log
+        </button>
+
+        <button class="control-btn" id="btnIncome" onclick="toggleType('income')">
+            <span class="icon">📥</span>
+            ထည့်ငွေ
+        </button>
+
+        <button class="control-btn" id="btnExpense" onclick="toggleType('expense')">
+            <span class="icon">📤</span>
+            ထုတ်ငွေ
+        </button>
+    </div>
+</div>
+
+
+</body>
+</html>
